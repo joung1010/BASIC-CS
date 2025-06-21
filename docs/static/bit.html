@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1비트와 2진수 - 스위치와 전구</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            margin: 0;
+            padding: 20px;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        .concept-section {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .single-bit {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .component {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .component-label {
+            font-weight: bold;
+            font-size: 1.1em;
+            text-align: center;
+        }
+
+        /* 전원 */
+        .power-source {
+            width: 60px;
+            height: 100px;
+            background: linear-gradient(to bottom, #ff6b6b, #ee5a52);
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .power-source::before {
+            content: '+';
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .power-source::after {
+            content: '-';
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        /* 스위치 */
+        .switch-container {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .switch {
+            width: 80px;
+            height: 40px;
+            background: #333;
+            border-radius: 20px;
+            position: relative;
+            transition: all 0.3s ease;
+            border: 3px solid #555;
+        }
+
+        .switch.on {
+            background: #4CAF50;
+            border-color: #45a049;
+        }
+
+        .switch-handle {
+            width: 30px;
+            height: 30px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 5px;
+            transform: translateY(-50%);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .switch.on .switch-handle {
+            left: 45px;
+        }
+
+        .switch-state {
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        /* 전선 */
+        .wire {
+            width: 100px;
+            height: 4px;
+            background: #666;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .wire.active {
+            background: linear-gradient(90deg, #ffeb3b, #ffc107);
+            box-shadow: 0 0 10px #ffeb3b;
+            animation: electricity 0.5s infinite alternate;
+        }
+
+        @keyframes electricity {
+            0% { box-shadow: 0 0 5px #ffeb3b; }
+            100% { box-shadow: 0 0 15px #ffeb3b, 0 0 25px #ffeb3b; }
+        }
+
+        /* 전구 */
+        .bulb {
+            width: 60px;
+            height: 80px;
+            background: #333;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .bulb.on {
+            background: radial-gradient(circle at center, #ffeb3b, #ffc107);
+            box-shadow: 0 0 30px #ffeb3b, 0 4px 8px rgba(0,0,0,0.3);
+            animation: glow 1s infinite alternate;
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 0 20px #ffeb3b, 0 4px 8px rgba(0,0,0,0.3); }
+            100% { box-shadow: 0 0 40px #ffeb3b, 0 0 60px #ffeb3b, 0 4px 8px rgba(0,0,0,0.3); }
+        }
+
+        .bulb-base {
+            width: 30px;
+            height: 20px;
+            background: #666;
+            margin: 0 auto;
+            border-radius: 0 0 5px 5px;
+        }
+
+        /* 비트 값 표시 */
+        .bit-value {
+            font-size: 3em;
+            font-weight: bold;
+            color: #ffeb3b;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-top: 10px;
+        }
+
+        .bit-value.zero {
+            color: #ff5722;
+        }
+
+        /* 멀티비트 섹션 */
+        .multi-bit {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .bit-unit {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .bit-unit h3 {
+            margin-top: 0;
+            color: #ffeb3b;
+        }
+
+        .binary-display {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #4CAF50;
+        }
+
+        .explanation {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            line-height: 1.6;
+        }
+
+        .explanation h3 {
+            color: #ffeb3b;
+            margin-top: 0;
+        }
+
+        .controls {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .control-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width: 768px) {
+            .single-bit {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .wire {
+                width: 50px;
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 class="title">🔌 1비트와 2진수 (디지털)</h1>
+    <p class="subtitle">전기 스위치로 이해하는 컴퓨터의 기본 원리</p>
+
+    <div class="concept-section">
+        <h2>📍 1비트 = 전기 스위치 1개</h2>
+
+        <div class="single-bit">
+            <div class="component">
+                <div class="power-source"></div>
+                <div class="component-label">전원<br>(Power)</div>
+            </div>
+
+            <div class="wire" id="wire1"></div>
+
+            <div class="component">
+                <div class="switch-container" onclick="toggleSwitch(1)">
+                    <div class="switch" id="switch1">
+                        <div class="switch-handle"></div>
+                    </div>
+                </div>
+                <div class="component-label">스위치<br>(Switch)</div>
+                <div class="switch-state" id="state1">OFF</div>
+            </div>
+
+            <div class="wire" id="wire2"></div>
+
+            <div class="component">
+                <div class="bulb" id="bulb1"></div>
+                <div class="bulb-base"></div>
+                <div class="component-label">전구<br>(Bulb)</div>
+            </div>
+
+            <div class="component">
+                <div class="bit-value zero" id="bit1">0</div>
+                <div class="component-label">비트 값<br>(Bit Value)</div>
+            </div>
+        </div>
+
+        <div class="explanation">
+            <h3>💡 동작 원리</h3>
+            <p><strong>스위치를 클릭해보세요!</strong></p>
+            <ul>
+                <li><strong>스위치 OFF (0)</strong>: 전기가 흐르지 않음 → 전구 꺼짐 → 비트값 0</li>
+                <li><strong>스위치 ON (1)</strong>: 전기가 흐름 → 전구 켜짐 → 비트값 1</li>
+            </ul>
+            <p>이것이 바로 <strong>1비트</strong>입니다! 컴퓨터는 수십억 개의 이런 스위치로 이루어져 있어요.</p>
+        </div>
+    </div>
+
+    <div class="concept-section">
+        <h2>🔢 여러 비트 조합 (Multi-Bit)</h2>
+
+        <div class="controls">
+            <button class="control-btn" onclick="setAllBits(0)">모든 스위치 OFF</button>
+            <button class="control-btn" onclick="setAllBits(1)">모든 스위치 ON</button>
+            <button class="control-btn" onclick="randomBits()">랜덤 설정</button>
+        </div>
+
+        <div class="multi-bit">
+            <div class="bit-unit">
+                <h3>비트 1 (2¹)</h3>
+                <div class="switch-container" onclick="toggleSwitch(2)">
+                    <div class="switch" id="switch2">
+                        <div class="switch-handle"></div>
+                    </div>
+                </div>
+                <div class="bulb" id="bulb2"></div>
+                <div class="bit-value zero" id="bit2">0</div>
+            </div>
+
+            <div class="bit-unit">
+                <h3>비트 2 (2²)</h3>
+                <div class="switch-container" onclick="toggleSwitch(3)">
+                    <div class="switch" id="switch3">
+                        <div class="switch-handle"></div>
+                    </div>
+                </div>
+                <div class="bulb" id="bulb3"></div>
+                <div class="bit-value zero" id="bit3">0</div>
+            </div>
+
+            <div class="bit-unit">
+                <h3>비트 3 (2³)</h3>
+                <div class="switch-container" onclick="toggleSwitch(4)">
+                    <div class="switch" id="switch4">
+                        <div class="switch-handle"></div>
+                    </div>
+                </div>
+                <div class="bulb" id="bulb4"></div>
+                <div class="bit-value zero" id="bit4">0</div>
+            </div>
+
+            <div class="bit-unit">
+                <h3>비트 4 (2⁴)</h3>
+                <div class="switch-container" onclick="toggleSwitch(5)">
+                    <div class="switch" id="switch5">
+                        <div class="switch-handle"></div>
+                    </div>
+                </div>
+                <div class="bulb" id="bulb5"></div>
+                <div class="bit-value zero" id="bit5">0</div>
+            </div>
+        </div>
+
+        <div class="binary-display" id="binaryDisplay">이진수: 0000 = 십진수: 0</div>
+
+        <div class="explanation">
+            <h3>🧮 2진수 계산</h3>
+            <p>각 비트는 2의 거듭제곱 값을 가집니다:</p>
+            <ul>
+                <li>비트 1: 2⁰ = 1</li>
+                <li>비트 2: 2¹ = 2</li>
+                <li>비트 3: 2² = 4</li>
+                <li>비트 4: 2³ = 8</li>
+            </ul>
+            <p><strong>예시:</strong> 1010 = 8×1 + 4×0 + 2×1 + 1×0 = 10</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 스위치 상태 배열
+    let switchStates = [false, false, false, false, false, false];
+
+    function toggleSwitch(switchNum) {
+        switchStates[switchNum] = !switchStates[switchNum];
+        updateDisplay(switchNum);
+
+        if (switchNum >= 2) {
+            updateBinaryDisplay();
+        }
+    }
+
+    function updateDisplay(switchNum) {
+        const switchElement = document.getElementById(`switch${switchNum}`);
+        const bulbElement = document.getElementById(`bulb${switchNum}`);
+        const bitElement = document.getElementById(`bit${switchNum}`);
+        const stateElement = document.getElementById(`state${switchNum}`);
+
+        if (switchStates[switchNum]) {
+            switchElement.classList.add('on');
+            bulbElement.classList.add('on');
+            bitElement.textContent = '1';
+            bitElement.classList.remove('zero');
+            if (stateElement) stateElement.textContent = 'ON';
+
+            // 첫 번째 스위치의 전선 활성화
+            if (switchNum === 1) {
+                document.getElementById('wire1').classList.add('active');
+                document.getElementById('wire2').classList.add('active');
+            }
+        } else {
+            switchElement.classList.remove('on');
+            bulbElement.classList.remove('on');
+            bitElement.textContent = '0';
+            bitElement.classList.add('zero');
+            if (stateElement) stateElement.textContent = 'OFF';
+
+            // 첫 번째 스위치의 전선 비활성화
+            if (switchNum === 1) {
+                document.getElementById('wire1').classList.remove('active');
+                document.getElementById('wire2').classList.remove('active');
+            }
+        }
+    }
+
+    function updateBinaryDisplay() {
+        let binaryString = '';
+        let decimalValue = 0;
+
+        for (let i = 5; i >= 2; i--) {
+            const bit = switchStates[i] ? 1 : 0;
+            binaryString += bit;
+            decimalValue += bit * Math.pow(2, i - 2);
+        }
+
+        document.getElementById('binaryDisplay').textContent =
+            `이진수: ${binaryString} = 십진수: ${decimalValue}`;
+    }
+
+    function setAllBits(value) {
+        for (let i = 2; i <= 5; i++) {
+            switchStates[i] = value === 1;
+            updateDisplay(i);
+        }
+        updateBinaryDisplay();
+    }
+
+    function randomBits() {
+        for (let i = 2; i <= 5; i++) {
+            switchStates[i] = Math.random() > 0.5;
+            updateDisplay(i);
+        }
+        updateBinaryDisplay();
+    }
+
+    // 초기 상태 설정
+    updateBinaryDisplay();
+</script>
+</body>
+</html>
